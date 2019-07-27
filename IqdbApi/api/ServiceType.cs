@@ -41,9 +41,9 @@ namespace IqdbApi.api
             Domain = domain;
         }
 
-        public static ServiceType GetTypeByUrl(String url) {
+        public static ServiceType GetTypeByUrl(Uri url) {
             foreach (var service in Values) {
-                if (url.Contains(service.Domain))
+                if (url.ToString().Contains(service.Domain))
                 {
                     return service;
                 }

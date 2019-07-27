@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IqdbApi.api.parser;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace IqdbApi.api
         public static readonly int MaxFileSize = 8388608;
         public static readonly int MaxImageWitdh = 7500;
         public static readonly int MaxImageHeight = 7500;
-        public static readonly string URL = "https://iqdb.org/";
+        public static readonly Uri Url = new Uri("https://iqdb.org/");
 
         private static readonly string FormUrl = "/";
         private static readonly string FieldService = "service[]";
@@ -27,7 +28,7 @@ namespace IqdbApi.api
         public BasicIqdbApi()
         {
             httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(URL);
+            httpClient.BaseAddress = Url;
         }
 
         public void Dispose()
@@ -62,9 +63,8 @@ namespace IqdbApi.api
             }
 
             var result = await httpClient.PostAsync(FormUrl, content);
-            string resultContent = await result.Content.ReadAsStringAsync();
-            Console.WriteLine(resultContent);
-            throw new NotImplementedException();
+            string htmlContent = await result.Content.ReadAsStringAsync();
+            return IqdbParser.ParseHtml(Url, htmlContent);
         }
     }
 }

@@ -12,9 +12,9 @@ namespace IqdbApi.api
         public int Width { get; }
         public int Height { get; }
         public ServiceType Type { get; }
-        public String Url { get; }
+        public Uri Url { get; }
 
-        public Match(int similarity, int width, int height, ServiceType type, string url)
+        public Match(int similarity, int width, int height, ServiceType type, Uri url)
         {
             Similarity = similarity;
             Width = width;
