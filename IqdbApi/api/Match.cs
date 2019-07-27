@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IqdbApi.api
 {
-    class Match : IComparable<Match>
+    public class Match : IComparable<Match>
     {
         public int Similarity { get; }
         public int Width { get; }

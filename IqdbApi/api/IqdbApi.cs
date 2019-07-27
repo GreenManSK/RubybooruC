@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace IqdbApi.api
 {
-    interface IqdbApi
+    public interface IqdbApi
     {
-        List<Match> SearchFile(string path, Options options);
-        List<Match> SearchUrl(string url, Options options);
+        Task<List<Match>> SearchFile(string path, Options options);
+        Task<List<Match>> SearchUrl(string url, Options options);
     }
 }

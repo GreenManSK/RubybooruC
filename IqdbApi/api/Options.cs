@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace IqdbApi.api
 {
-    class Options
+    public class Options
     {
         public static readonly Options Default = new Options(new HashSet<ServiceType>(ServiceType.Values), false);
 
-        ICollection<ServiceType> services { get; }
-        bool IgnoreColors { get; } = false;
+        public ICollection<ServiceType> Services { get; }
+        public bool IgnoreColors { get; } = false;
 
         public Options()
         {
@@ -19,7 +19,7 @@ namespace IqdbApi.api
 
         public Options(ICollection<ServiceType> services, bool ignoreColors)
         {
-            this.services = services;
+            Services = services;
             IgnoreColors = ignoreColors;
         }
     }

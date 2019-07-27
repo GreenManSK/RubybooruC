@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IqdbApi.api
 {
-    sealed class ServiceType
+    public sealed class ServiceType
     {
         public static readonly ServiceType Danbooru = new ServiceType(1, "danbooru.donmai.us");
         public static readonly ServiceType Konachan = new ServiceType(2, "konachan.com");
