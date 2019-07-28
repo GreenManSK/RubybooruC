@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IqdbApi.api
 {
@@ -41,13 +38,16 @@ namespace IqdbApi.api
             Domain = domain;
         }
 
-        public static ServiceType GetTypeByUrl(Uri url) {
-            foreach (var service in Values) {
+        public static ServiceType GetTypeByUrl(Uri url)
+        {
+            foreach (var service in Values)
+            {
                 if (url.ToString().Contains(service.Domain))
                 {
                     return service;
                 }
             }
+
             throw new ArgumentOutOfRangeException("URL dose not match any type");
         }
     }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace IqdbApi.api
 {
@@ -11,7 +7,7 @@ namespace IqdbApi.api
         public static readonly Options Default = new Options(new HashSet<ServiceType>(ServiceType.Values), false);
 
         public ICollection<ServiceType> Services { get; }
-        public bool IgnoreColors { get; } = false;
+        public bool IgnoreColors { get; }
 
         public Options()
         {
