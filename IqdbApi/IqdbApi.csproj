@@ -52,6 +52,7 @@
     <Compile Include="api\parser\IqdbParser.cs" />
     <Compile Include="api\ServiceType.cs" />
     <Compile Include="parsers\AbstractParser.cs" />
+    <Compile Include="parsers\impl\AnimePictureParser.cs" />
     <Compile Include="parsers\impl\KonachanParser.cs" />
     <Compile Include="parsers\MoebooruParser.cs" />
     <Compile Include="parsers\Parser.cs" />
