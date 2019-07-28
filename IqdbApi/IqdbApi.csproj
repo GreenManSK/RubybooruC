@@ -51,10 +51,19 @@
     <Compile Include="api\Options.cs" />
     <Compile Include="api\parser\IqdbParser.cs" />
     <Compile Include="api\ServiceType.cs" />
+    <Compile Include="parsers\AbstractParser.cs" />
+    <Compile Include="parsers\MoebooruParser.cs" />
+    <Compile Include="parsers\Parser.cs" />
+    <Compile Include="parsers\ParseResult.cs" />
+    <Compile Include="parsers\Tag.cs" />
+    <Compile Include="parsers\TagType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="parsers\impl" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
