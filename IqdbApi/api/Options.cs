@@ -9,10 +9,6 @@ namespace IqdbApi.api
         public ICollection<ServiceType> Services { get; }
         public bool IgnoreColors { get; }
 
-        public Options()
-        {
-        }
-
         public Options(ICollection<ServiceType> services, bool ignoreColors)
         {
             Services = services;

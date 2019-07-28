@@ -14,7 +14,7 @@ namespace IqdbApi.api.parser
         private const int ValidRowCount = 5;
 
         private const int ImageRow = 1;
-        private static readonly int ServiceRow = 2;
+        private const int ServiceRow = 2;
         private const int SizeRow = 3;
         private const int SimilarityRow = 4;
 
@@ -42,7 +42,7 @@ namespace IqdbApi.api.parser
             {
                 var rowsDescendants = match.Descendants("tr");
                 var rows = rowsDescendants as HtmlNode[] ?? rowsDescendants.ToArray();
-                if (rows.Count() != ValidRowCount || !match.Descendants("img").Any())
+                if (rows.Length != ValidRowCount || !match.Descendants("img").Any())
                 {
                     continue;
                 }

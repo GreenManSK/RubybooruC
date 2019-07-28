@@ -30,7 +30,7 @@ namespace IqdbApi.api
         }
 
         public int Id { get; }
-        public String Domain { get; }
+        public string Domain { get; }
 
         private ServiceType(int id, string domain)
         {
