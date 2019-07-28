@@ -1,16 +1,22 @@
+using System;
+using System.Threading.Tasks;
 using HtmlAgilityPack;
 
 namespace IqdbApi.parsers
 {
-    public abstract class AbstractParser: Parser
+    public abstract class AbstractParser: IParser
     {
-        public abstract ParseResult Parse(string url);
+        public abstract Task<ParseResult> Parse(Uri url);
 
-        protected HtmlDocument CreateDoc(string url)
+        protected static Task<HtmlDocument> CreateDoc(Uri url)
         {
-            var doc = new HtmlDocument();
-            doc.Load(url);
-            return doc;
+            var task = Task.Run(() =>
+            {
+                var web = new HtmlWeb();
+                var doc = web.Load(url.ToString());
+                return doc;
+            });
+            return task;
         }
     }
 }

@@ -1,7 +1,10 @@
+using System;
+using System.Threading.Tasks;
+
 namespace IqdbApi.parsers
 {
-    public interface Parser
+    public interface IParser
     {
-        ParseResult Parse(string url);
+        Task<ParseResult> Parse(Uri url);
     }
 }

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using HtmlAgilityPack;
 
 namespace IqdbApi.parsers
@@ -12,6 +14,18 @@ namespace IqdbApi.parsers
         private const string ImageLinkChangedClass = "original-file-changed";
 
         private const string SourceText = "Source";
+        
+        public override async Task<ParseResult> Parse(Uri url)
+        {
+            var doc = await CreateDoc(url);
+            var image = GetImage(url, doc);
+            var source = GetSource(url, doc);
+            var tags = GetTags(doc);
+            
+            return new ParseResult(tags, image, source);
+        }
+
+        protected abstract List<Tag> GetTags(HtmlDocument doc);
         
         protected Uri GetImage(Uri baseUrl, HtmlDocument doc)
         {

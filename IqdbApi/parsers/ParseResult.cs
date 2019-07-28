@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace IqdbApi.parsers
@@ -5,10 +6,10 @@ namespace IqdbApi.parsers
     public class ParseResult
     {
         public List<Tag> Tags { get; }
-        public string Image { get; }
-        public string Source { get; }
+        public Uri Image { get; }
+        public Uri Source { get; }
 
-        public ParseResult(List<Tag> tags, string image, string source)
+        public ParseResult(List<Tag> tags, Uri image, Uri source)
         {
             Tags = tags;
             Image = image;
