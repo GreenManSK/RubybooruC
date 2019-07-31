@@ -37,7 +37,7 @@ namespace IqdbApi.parsers.impl
 
         private static Uri GetImage(Uri baseUrl, HtmlDocument doc)
         {
-            var link = doc.DocumentNode.SelectNodes($"//a[@class='{ImageLinkClass}']").First();
+            var link = doc.DocumentNode.SelectNodes($"a[@class='{ImageLinkClass}']").First();
             return link != null ? new Uri(baseUrl, link.GetAttributeValue("href", "")) : null;
         }
     }
