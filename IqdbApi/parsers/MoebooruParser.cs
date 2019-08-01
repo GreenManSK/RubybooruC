@@ -29,7 +29,8 @@ namespace IqdbApi.parsers
         
         protected Uri GetImage(Uri baseUrl, HtmlDocument doc)
         {
-            var link = doc.DocumentNode.SelectNodes($"//a[@class='{ImageLinkOriginalClass}']").First() ??
+            var original = doc.DocumentNode.SelectNodes($"//a[@class='{ImageLinkOriginalClass}']");
+            var link = original != null && original.Any() ? original.First() : 
                        doc.DocumentNode.SelectNodes($"//a[@class='{ImageLinkChangedClass}']").First();
             return new Uri(baseUrl, link.GetAttributeValue("href", ""));
         }
