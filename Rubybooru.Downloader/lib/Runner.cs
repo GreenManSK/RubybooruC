@@ -23,10 +23,11 @@ namespace Rubybooru.Downloader.lib
             // TODO: Make task?
             var files = GetFiles(settings.SourceImagesDirPath, settings.IncludeSubdirs);
             files = Preprocess(files);
-            Console.WriteLine(files);
-            // Preprocessor.Preprocess
+            files = Filter.FilterFiles(files, settings.AllowedExtensions);
             // Filter.Filter
             // Downloader.Start
+
+            Console.WriteLine(files);
         }
 
         private List<string> GetFiles(string path, bool includeSubdirs)

@@ -33,11 +33,11 @@ namespace Rubybooru.Downloader
         public bool RenameLargeExt { get; set; } = true;
         public bool DeleteWindowsDuplicates { get; set; } = true;
 
-        public List<string> AllowedExtensions { get; set; } = new List<string>()
+        public HashSet<string> AllowedExtensions { get; set; } = new HashSet<string>()
         {
-            "jpg",
-            "jpeg",
-            "png"
+            ".jpg",
+            ".jpeg",
+            ".png"
         };
     }
 }

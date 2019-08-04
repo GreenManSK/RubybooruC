@@ -63,6 +63,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="lib\Downloader.cs" />
+    <Compile Include="lib\Filter.cs" />
     <Compile Include="lib\preprocess\ChromeDuplicatePreprocessor.cs" />
     <Compile Include="lib\preprocess\LargeExtPreprocessor.cs" />
     <Compile Include="lib\preprocess\IPreprocessor.cs" />
