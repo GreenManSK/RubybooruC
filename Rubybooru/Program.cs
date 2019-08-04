@@ -1,5 +1,8 @@
-﻿using System;
-using IqdbApi.api;
+﻿using IqdbApi.api;
+using IqdbApi.parsers.impl;
+using Rubybooru.Downloader;
+using Rubybooru.Downloader.lib;
+using System;
 
 namespace Rubybooru
 {
@@ -7,13 +10,13 @@ namespace Rubybooru
     {
         static void Main(string[] args)
         {
-            using (var iqdb = new BasicIqdbApi()) {
-                var r =  iqdb.SearchUrl("http://img7.anidb.net/pics/anime/235604.jpg", Options.Default);
-                //var r = iqdb.SearchFile(@"C:\Users\lukas\OneDrive\Downloads\235604.jpg", Options.Default);
-                r.Wait();
-                Console.WriteLine(r.Result.ToString());
-            }
-            Console.ReadKey();
+            var settings = new Settings();
+
+            // settings.IncludeSubdirs = true;
+            settings.SourceImagesDirPath = @"C:\Users\lukas\OneDrive\Ayanoneebook\Desktop\sort test";
+
+            var runner = new Runner(settings);
+            runner.Start();
         }
     }
 }
