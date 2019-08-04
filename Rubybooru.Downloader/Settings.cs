@@ -15,7 +15,7 @@ namespace Rubybooru.Downloader
 
         public int RequestDelayMs { get; set; } = 750;
 
-        public List<ServiceType> services { get; set; } = new List<ServiceType>()
+        public List<ServiceType> Services { get; set; } = new List<ServiceType>()
         {
             ServiceType.Konachan,
             ServiceType.YandeRe,

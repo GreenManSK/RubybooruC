@@ -64,11 +64,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="lib\Downloader.cs" />
+    <Compile Include="lib\DownloadError.cs" />
     <Compile Include="lib\Filter.cs" />
+    <Compile Include="lib\helper\MatchRanker.cs" />
     <Compile Include="lib\preprocess\ChromeDuplicatePreprocessor.cs" />
     <Compile Include="lib\preprocess\LargeExtPreprocessor.cs" />
     <Compile Include="lib\preprocess\IPreprocessor.cs" />
     <Compile Include="lib\preprocess\PreprocessorRunner.cs" />
+    <Compile Include="lib\ProcessingFileInfo.cs" />
     <Compile Include="lib\Runner.cs" />
     <Compile Include="Settings.cs" />
     <Page Include="MainWindow.xaml">
