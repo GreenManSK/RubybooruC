@@ -20,7 +20,7 @@ namespace Rubybooru.Downloader.lib.helper
         {
             return matches.Where(m => m.Similarity >= minSimilarity)
                    .OrderBy(m => serviceValues[ServiceType.GetTypeByUrl(m.Url).Id])
-                   .First();
+                   .FirstOrDefault();
         }
 
         private void BuildServiceValues(IEnumerable<ServiceType> services)

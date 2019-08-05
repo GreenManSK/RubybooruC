@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using IqdbApi.api;
 using NLog;
 using Rubybooru.Downloader.lib.helper;
 
@@ -11,7 +13,7 @@ namespace Rubybooru.Downloader.lib
     public class Downloader
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        
+
         public readonly int TotalFiles;
         public int FinishedFiles { get; private set; }
         public readonly ObservableCollection<ProcessingFileInfo> ProcessingFiles;
@@ -38,7 +40,10 @@ namespace Rubybooru.Downloader.lib
                 var last = files.Last();
                 foreach (var file in files)
                 {
-                    DownloadFile(file);
+                    Logger.Info($"Fetching '{file}'");
+                    var processingFile = new ProcessingFileInfo(file);
+                    ProcessingFiles.Add(processingFile);
+                    DownloadFile(processingFile, iqdbApi);
                     if (!file.Equals(last))
                     {
                         await Task.Delay(settings.RequestDelayMs);
@@ -47,18 +52,73 @@ namespace Rubybooru.Downloader.lib
             }
         }
 
-        private void DownloadFile(string file)
+        private async void DownloadFile(ProcessingFileInfo file, IIqdbApi iqdbApi)
         {
             try
             {
-                // TODO: Download info
+                List<Match> matches = null;
+                try
+                {
+                    file.State = ProcessingState.Fetching;
+                    matches = await iqdbApi.SearchFile(file.File, Options.Default);
+                }
+                catch (FileSizeLimitException e)
+                {
+                    // TODO: Resize image
+                }
+
+                Task.Run(() => ProcessMatches(file, matches));
             }
             catch (Exception e)
             {
-                var msg = $"Error while downloading file '{file}'";
+                var msg = $"Error while downloading file '{file.File}'";
                 Logger.Error(e, msg);
                 Errors.Add(new DownloadError(msg, e));
             }
+        }
+
+        private void ProcessMatches(ProcessingFileInfo file, List<Match> matches)
+        {
+            var best = matches != null ? matchRanker.PickBest(matches) : null;
+            if (best != null)
+            {
+                Logger.Info($"Parsing '{file}'");
+                file.State = ProcessingState.Parsing;
+                // TODO: parse match
+                // TODO: move match
+                FinishFile(file);
+            }
+            else
+            {
+                Logger.Info($"No match for '{file}'");
+                file.State = ProcessingState.Saving;
+                MoveFile(file, settings.NoMatchDirPath);
+                FinishFile(file);
+            }
+        }
+
+        private void MoveFile(ProcessingFileInfo file, string dest)
+        {
+            if (dest == null)
+                return;
+            try
+            {
+                var fileName = Path.GetFileName(file.File);
+                var destFile = Path.Combine(dest, fileName);
+                File.Move(file.File, destFile);
+            }
+            catch (Exception e)
+            {
+                var msg = $"Error while moving file '{file.File}' to '{dest}'";
+                Logger.Error(e, msg);
+                Errors.Add(new DownloadError(msg, e));
+            }
+        }
+
+        private void FinishFile(ProcessingFileInfo file)
+        {
+            ProcessingFiles.Remove(file);
+            FinishedFiles++;
         }
 
         public static string GetJsonFileName(string file)

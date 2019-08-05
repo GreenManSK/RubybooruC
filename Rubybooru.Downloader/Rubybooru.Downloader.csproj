@@ -73,6 +73,7 @@
     <Compile Include="lib\preprocess\PreprocessorRunner.cs" />
     <Compile Include="lib\ProcessingFileInfo.cs" />
     <Compile Include="lib\Runner.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Settings.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
