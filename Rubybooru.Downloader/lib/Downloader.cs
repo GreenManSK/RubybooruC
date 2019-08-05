@@ -1,12 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
+using NLog;
 using Rubybooru.Downloader.lib.helper;
 
 namespace Rubybooru.Downloader.lib
 {
     public class Downloader
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        
         public readonly int TotalFiles;
         public int FinishedFiles { get; private set; }
         public readonly ObservableCollection<ProcessingFileInfo> ProcessingFiles;
@@ -26,10 +31,33 @@ namespace Rubybooru.Downloader.lib
             matchRanker = new MatchRanker(settings.MinSimilarity, settings.Services);
         }
 
-        public void Start()
+        public async Task Start()
         {
             using (var iqdbApi = new IqdbApi.api.IqdbApi())
             {
+                var last = files.Last();
+                foreach (var file in files)
+                {
+                    DownloadFile(file);
+                    if (!file.Equals(last))
+                    {
+                        await Task.Delay(settings.RequestDelayMs);
+                    }
+                }
+            }
+        }
+
+        private void DownloadFile(string file)
+        {
+            try
+            {
+                // TODO: Download info
+            }
+            catch (Exception e)
+            {
+                var msg = $"Error while downloading file '{file}'";
+                Logger.Error(e, msg);
+                Errors.Add(new DownloadError(msg, e));
             }
         }
 
