@@ -1,10 +1,8 @@
-﻿using Rubybooru.Downloader.lib.preprocess;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Rubybooru.Downloader.lib.preprocess;
 
 namespace Rubybooru.Downloader.lib
 {

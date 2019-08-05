@@ -1,10 +1,7 @@
-﻿using Rubybooru.Downloader.lib.helper;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Rubybooru.Downloader.lib.helper;
 
 namespace Rubybooru.Downloader.lib
 {
@@ -31,7 +28,9 @@ namespace Rubybooru.Downloader.lib
 
         public void Start()
         {
-            
+            using (var iqdbApi = new IqdbApi.api.IqdbApi())
+            {
+            }
         }
 
         public static string GetJsonFileName(string file)
