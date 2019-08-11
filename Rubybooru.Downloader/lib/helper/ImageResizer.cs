@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -39,9 +40,22 @@ namespace Rubybooru.Downloader.lib.helper
 
         private static void ComputeSize(Image image, int maxWidth, int maxHeight, out int width, out int height)
         {
-            // TODO: compute right sizes based on ratio and so
-            width = maxWidth;
-            height = maxHeight;
+            if (image.Width < maxWidth && image.Height < maxHeight)
+            {
+                width = maxWidth;
+                height = maxHeight;
+                return;
+            }
+            if (image.Width > image.Height)
+            {
+                width = maxWidth;
+                height = Convert.ToInt32(Math.Floor(width * (1.0 * image.Height / image.Width)));
+            }
+            else
+            {
+                height = maxHeight;
+                width = Convert.ToInt32(Math.Floor(height * (1.0 * image.Width / image.Height)));
+            }
         }
         
         private static ImageFormat GetFormat(string fileName)

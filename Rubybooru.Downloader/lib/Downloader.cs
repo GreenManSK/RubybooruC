@@ -65,6 +65,7 @@ namespace Rubybooru.Downloader.lib
                 catch (FileSizeLimitException e)
                 {
                     // TODO: Resize image
+                    // TODO: Delete resized temp
                 }
 
                 Task.Run(() => ProcessMatches(file, matches));
