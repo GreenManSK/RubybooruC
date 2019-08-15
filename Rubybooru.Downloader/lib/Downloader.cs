@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using IqdbApi.api;
 using NLog;
@@ -15,7 +16,7 @@ namespace Rubybooru.Downloader.lib
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public readonly int TotalFiles;
-        public int FinishedFiles { get; private set; }
+        public int FinishedFiles;
         public readonly ObservableCollection<ProcessingFileInfo> ProcessingFiles;
         public readonly ObservableCollection<DownloadError> Errors;
 
@@ -119,7 +120,7 @@ namespace Rubybooru.Downloader.lib
         private void FinishFile(ProcessingFileInfo file)
         {
             ProcessingFiles.Remove(file);
-            FinishedFiles++;
+            Interlocked.Increment(ref FinishedFiles);
         }
 
         public static string GetJsonFileName(string file)
