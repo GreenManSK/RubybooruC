@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IqdbApi.api;
+using IqdbApi.parsers.impl;
 using NLog;
 using Rubybooru.Downloader.lib.helper;
 
@@ -17,37 +18,41 @@ namespace Rubybooru.Downloader.lib
 
         public readonly int TotalFiles;
         public int FinishedFiles;
-        public readonly ObservableCollection<ProcessingFileInfo> ProcessingFiles;
-        public readonly ObservableCollection<DownloadError> Errors;
+        public readonly ConcurrentDictionary<string, ProcessingFileInfo> ProcessingFiles;
+        public readonly ConcurrentBag<DownloadError> Errors;
 
-        private readonly IEnumerable<string> files;
-        private readonly Settings settings;
-        private readonly MatchRanker matchRanker;
+        private readonly List<string> _files;
+        private readonly Settings _settings;
+        private readonly CancellationToken _cancelToken;
+        private readonly MatchRanker _matchRanker;
+        private readonly DynamicParser _parser;
 
-        public Downloader(IEnumerable<string> files, Settings settings)
+        public Downloader(List<string> files, Settings settings, CancellationToken cancelToken)
         {
-            this.files = files;
-            this.settings = settings;
-            TotalFiles = files.Count();
-            ProcessingFiles = new ObservableCollection<ProcessingFileInfo>();
-            Errors = new ObservableCollection<DownloadError>();
-            matchRanker = new MatchRanker(settings.MinSimilarity, settings.Services);
+            _files = files;
+            _settings = settings;
+            _cancelToken = cancelToken;
+            TotalFiles = files.Count;
+            ProcessingFiles = new ConcurrentDictionary<string, ProcessingFileInfo>();
+            Errors = new ConcurrentBag<DownloadError>();
+            _matchRanker = new MatchRanker(settings.MinSimilarity, settings.Services);
+            _parser = new DynamicParser();
         }
 
         public async Task Start()
         {
             using (var iqdbApi = new IqdbApi.api.IqdbApi())
             {
-                var last = files.Last();
-                foreach (var file in files)
+                var last = _files.Last();
+                foreach (var file in _files)
                 {
                     Logger.Info($"Fetching '{file}'");
                     var processingFile = new ProcessingFileInfo(file);
-                    ProcessingFiles.Add(processingFile);
+                    ProcessingFiles.GetOrAdd(processingFile.File, processingFile);
                     DownloadFile(processingFile, iqdbApi);
                     if (!file.Equals(last))
                     {
-                        await Task.Delay(settings.RequestDelayMs);
+                        await Task.Delay(_settings.RequestDelayMs);
                     }
                 }
             }
@@ -57,7 +62,7 @@ namespace Rubybooru.Downloader.lib
         {
             try
             {
-                List<Match> matches = null;
+                List<Match> matches;
                 try
                 {
                     file.State = ProcessingState.Fetching;
@@ -65,11 +70,10 @@ namespace Rubybooru.Downloader.lib
                 }
                 catch (FileSizeLimitException e)
                 {
-                    // TODO: Resize image
-                    // TODO: Delete resized temp
+                    matches = await DownloadResizedFile(file, iqdbApi);
                 }
 
-                Task.Run(() => ProcessMatches(file, matches));
+                Task.Run(() => ProcessMatches(file, matches), _cancelToken);
             }
             catch (Exception e)
             {
@@ -79,22 +83,40 @@ namespace Rubybooru.Downloader.lib
             }
         }
 
-        private void ProcessMatches(ProcessingFileInfo file, List<Match> matches)
+        private async Task<List<Match>> DownloadResizedFile(ProcessingFileInfo file, IIqdbApi iqdbApi)
         {
-            var best = matches != null ? matchRanker.PickBest(matches) : null;
+            var resizedFile = ImageResizer.Resize(
+                file.File,
+                IqdbApi.api.IqdbApi.MaxImageWidth,
+                IqdbApi.api.IqdbApi.MaxImageHeight
+            );
+            var matches = await iqdbApi.SearchFile(resizedFile, Options.Default);
+            File.Delete(resizedFile);
+
+            return matches;
+        }
+
+        private async void ProcessMatches(ProcessingFileInfo file, IReadOnlyCollection<Match> matches)
+        {
+            var best = matches != null ? _matchRanker.PickBest(matches) : null;
             if (best != null)
             {
                 Logger.Info($"Parsing '{file}'");
                 file.State = ProcessingState.Parsing;
-                // TODO: parse match
-                // TODO: move match
+                
+                // TODO: parse match - parser locks, error catching
+                var result = await _parser.Parse(best.Url);
+                
+                MoveFile(file, _settings.DownloadedDirPath);
+                // TODO: save data
+                
                 FinishFile(file);
             }
             else
             {
                 Logger.Info($"No match for '{file}'");
                 file.State = ProcessingState.Saving;
-                MoveFile(file, settings.NoMatchDirPath);
+                MoveFile(file, _settings.NoMatchDirPath);
                 FinishFile(file);
             }
         }
@@ -119,7 +141,7 @@ namespace Rubybooru.Downloader.lib
 
         private void FinishFile(ProcessingFileInfo file)
         {
-            ProcessingFiles.Remove(file);
+            ProcessingFiles.TryRemove(file.File, out _);
             Interlocked.Increment(ref FinishedFiles);
         }
 

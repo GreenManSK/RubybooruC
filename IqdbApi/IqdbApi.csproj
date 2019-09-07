@@ -58,10 +58,10 @@
     <Compile Include="parsers\impl\EShuushuuParser.cs" />
     <Compile Include="parsers\impl\GelbooruParser.cs" />
     <Compile Include="parsers\impl\KonachanParser.cs" />
+    <Compile Include="parsers\impl\MoebooruParser.cs" />
     <Compile Include="parsers\impl\SankakuChannelParser.cs" />
     <Compile Include="parsers\impl\YandeReParser.cs" />
     <Compile Include="parsers\impl\ZerochanParser.cs" />
-    <Compile Include="parsers\MoebooruParser.cs" />
     <Compile Include="parsers\Parser.cs" />
     <Compile Include="parsers\ParseResult.cs" />
     <Compile Include="parsers\Tag.cs" />

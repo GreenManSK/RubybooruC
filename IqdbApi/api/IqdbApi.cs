@@ -9,6 +9,9 @@ namespace IqdbApi.api
 {
     public class IqdbApi : IIqdbApi, IDisposable
     {
+        public const int MaxImageWidth = 7500;
+        public const int MaxImageHeight = 7500;
+
         private const int MaxFileSize = 8388608;
         private static readonly Uri Url = new Uri("https://iqdb.org/");
 
