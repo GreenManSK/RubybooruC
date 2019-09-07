@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IqdbApi.api;
+using IqdbApi.parsers;
 using IqdbApi.parsers.impl;
 using NLog;
 using Rubybooru.Downloader.lib.helper;
@@ -43,7 +44,7 @@ namespace Rubybooru.Downloader.lib
         {
             using (var iqdbApi = new IqdbApi.api.IqdbApi())
             {
-                var last = _files.Last();
+                var last = _files.Count > 0 ? _files.Last() : null;
                 foreach (var file in _files)
                 {
                     Logger.Info($"Fetching '{file}'");
@@ -72,15 +73,14 @@ namespace Rubybooru.Downloader.lib
                 {
                     matches = await DownloadResizedFile(file, iqdbApi);
                 }
+
                 Logger.Info($"Have matches for '{file}'");
 
                 Task.Run(() => ProcessMatches(file, matches), _cancelToken);
             }
             catch (Exception e)
             {
-                var msg = $"Error while downloading file '{file.File}'";
-                Logger.Error(e, msg);
-                Errors.Add(new DownloadError(msg, e));
+                FileError(file, e, $"Error while downloading file '{file.File}'");
             }
         }
 
@@ -97,20 +97,36 @@ namespace Rubybooru.Downloader.lib
             return matches;
         }
 
-        private async void ProcessMatches(ProcessingFileInfo file, IReadOnlyCollection<Match> matches)
+        private void ProcessMatches(ProcessingFileInfo file, IReadOnlyCollection<Match> matches)
         {
             var best = matches != null ? _matchRanker.PickBest(matches) : null;
             if (best != null)
             {
                 Logger.Info($"Parsing '{file}'");
                 file.State = ProcessingState.Parsing;
-                
-                // TODO: parse match - parser locks, error catching
-                // var result = await _parser.Parse(best.Url);
-                
+
+                ParseResult result = null;
+                lock (ServiceType.GetTypeByUrl(best.Url))
+                {
+                    try
+                    {
+                        var parseTask = _parser.Parse(best.Url);
+                        parseTask.Wait(_cancelToken);
+                        result = parseTask.Result;
+                    }
+                    catch (Exception e)
+                    {
+                        var msg = $"Error while parsing file '{file.File}'";
+                        Logger.Error(e, msg);
+                        Errors.Add(new DownloadError(msg, e));
+                    }
+                }
+
+                if (result == null) return;
                 MoveFile(file, _settings.DownloadedDirPath);
                 // TODO: save data
-                
+                Logger.Info(file.File + " " + result.Tags.Count);
+
                 FinishFile(file);
             }
             else
@@ -134,16 +150,24 @@ namespace Rubybooru.Downloader.lib
             }
             catch (Exception e)
             {
-                var msg = $"Error while moving file '{file.File}' to '{dest}'";
-                Logger.Error(e, msg);
-                Errors.Add(new DownloadError(msg, e));
+                FileError(file, e, $"Error while moving file '{file.File}' to '{dest}'");
             }
+        }
+
+        private void FileError(ProcessingFileInfo file, Exception e, string msg)
+        {
+            file.State = ProcessingState.Error;
+            Logger.Error(e, msg);
+            Errors.Add(new DownloadError(msg, e));
+            FinishFile(file);
         }
 
         private void FinishFile(ProcessingFileInfo file)
         {
-            ProcessingFiles.TryRemove(file.File, out _);
-            Interlocked.Increment(ref FinishedFiles);
+            if (ProcessingFiles.TryRemove(file.File, out _))
+            {
+                Interlocked.Increment(ref FinishedFiles);
+            }
         }
 
         public static string GetJsonFileName(string file)
