@@ -136,7 +136,7 @@ namespace Rubybooru.Downloader.lib
             }
             else
             {
-                Logger.Info($"No match for '{file}'");
+                Logger.Info($"No match for '{file.File}'");
                 file.State = ProcessingState.Saving;
                 MoveFile(file, _settings.NoMatchDirPath);
                 FinishFile(file);
