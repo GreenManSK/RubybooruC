@@ -20,7 +20,7 @@ namespace Rubybooru.Data
         {
             var image = new Image();
 
-            image.Source = result.Source.ToString();
+            image.Source = result.Source != null ? result.Source.ToString() : null;
             image.InfoSourceSimilarity = match.Similarity;
             image.InfoSource = match.Url.ToString();
             image.Fetched = DateTime.Now;

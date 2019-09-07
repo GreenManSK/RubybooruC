@@ -74,9 +74,6 @@ namespace Rubybooru.Downloader.lib
                 {
                     matches = await DownloadResizedFile(file, iqdbApi);
                 }
-
-                Logger.Info($"Have matches for '{file}'");
-
                 Task.Run(() => ProcessMatches(file, matches), _cancelToken);
             }
             catch (Exception e)
