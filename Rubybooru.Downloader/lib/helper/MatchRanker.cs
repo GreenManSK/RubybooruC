@@ -16,11 +16,10 @@ namespace Rubybooru.Downloader.lib.helper
             BuildServiceValues(services);
         }
 
-        public Match PickBest(IEnumerable<Match> matches)
+        public List<Match> OrderBest(IEnumerable<Match> matches)
         {
             return matches.Where(m => m.Similarity >= minSimilarity)
-                   .OrderBy(m => serviceValues[ServiceType.GetTypeByUrl(m.Url).Id])
-                   .FirstOrDefault();
+                   .OrderBy(m => serviceValues[ServiceType.GetTypeByUrl(m.Url).Id]).ToList();
         }
 
         private void BuildServiceValues(IEnumerable<ServiceType> services)

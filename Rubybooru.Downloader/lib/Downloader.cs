@@ -74,6 +74,7 @@ namespace Rubybooru.Downloader.lib
                 {
                     matches = await DownloadResizedFile(file, iqdbApi);
                 }
+
                 Task.Run(() => ProcessMatches(file, matches), _cancelToken);
             }
             catch (Exception e)
@@ -97,8 +98,8 @@ namespace Rubybooru.Downloader.lib
 
         private void ProcessMatches(ProcessingFileInfo file, IReadOnlyCollection<Match> matches)
         {
-            var best = matches != null ? _matchRanker.PickBest(matches) : null;
-            if (best != null)
+            var bests = matches != null ? _matchRanker.OrderBest(matches) : null;
+            foreach (var best in bests)
             {
                 Logger.Info($"Parsing '{file.File}'");
                 file.State = ProcessingState.Parsing;
@@ -114,11 +115,11 @@ namespace Rubybooru.Downloader.lib
                     }
                     catch (Exception e)
                     {
-                        FileError(file, e, $"Error while parsing file '{file.File}'");
+                        Logger.Error(e, $"Error while parsing file '{file.File}'");
                     }
                 }
 
-                if (result == null) return;
+                if (result == null) continue;
                 var newFilePath = MoveFile(file, _settings.DownloadedDirPath);
                 try
                 {
@@ -130,14 +131,13 @@ namespace Rubybooru.Downloader.lib
                 }
 
                 FinishFile(file);
+                return;
             }
-            else
-            {
-                Logger.Info($"No match for '{file.File}'");
-                file.State = ProcessingState.Saving;
-                MoveFile(file, _settings.NoMatchDirPath);
-                FinishFile(file);
-            }
+
+            Logger.Info($"No match for '{file.File}'");
+            file.State = ProcessingState.Saving;
+            MoveFile(file, _settings.NoMatchDirPath);
+            FinishFile(file);
         }
 
         private string MoveFile(ProcessingFileInfo file, string dest)

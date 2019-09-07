@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Rubybooru.Data;
 
 namespace Rubybooru.Downloader.lib
 {
@@ -15,7 +16,7 @@ namespace Rubybooru.Downloader.lib
 
         private static bool IsAlreadyDownloaded(string file)
         {
-            return File.Exists(Downloader.GetJsonFileName(file));
+            return File.Exists(JsonHelper.GetJsonFileName(file));
         }
 
         private static bool IsAllowedExt(string fileName, ICollection<string> allowedExt)

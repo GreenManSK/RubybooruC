@@ -34,7 +34,7 @@ namespace Rubybooru.Data
             image.Width = imageObj.Width;
             image.Height = imageObj.Height;
 
-            var jsonFile = $"{file}{FileExt}";
+            var jsonFile = GetJsonFileName(file);
 
             using (StreamWriter sw = new StreamWriter(jsonFile))
             using (JsonWriter writer = new JsonTextWriter(sw))
@@ -52,6 +52,11 @@ namespace Rubybooru.Data
             }
 
             return _serializer;
+        }
+
+        public static string GetJsonFileName(string file)
+        {
+            return $"{file}{FileExt}";
         }
     }
 }
