@@ -55,7 +55,10 @@ namespace IqdbApi.parsers.impl
         {
             var tags = new List<Tag>();
 
-            var section = doc.DocumentNode.SelectNodes($"//ul[@class='{tagClass}']").First();
+            var sections = doc.DocumentNode.SelectNodes($"//ul[@class='{tagClass}']");
+            if (sections == null || sections.Count == 0)
+                return tags;
+            var section = sections.First();
             if (section == null)
                 return tags;
 
