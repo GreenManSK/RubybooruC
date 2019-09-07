@@ -49,7 +49,7 @@ namespace Rubybooru.Downloader.lib
                     Logger.Info($"Fetching '{file}'");
                     var processingFile = new ProcessingFileInfo(file);
                     ProcessingFiles.GetOrAdd(processingFile.File, processingFile);
-                    DownloadFile(processingFile, iqdbApi);
+                    await DownloadFile(processingFile, iqdbApi);
                     if (!file.Equals(last))
                     {
                         await Task.Delay(_settings.RequestDelayMs);
@@ -58,7 +58,7 @@ namespace Rubybooru.Downloader.lib
             }
         }
 
-        private async void DownloadFile(ProcessingFileInfo file, IIqdbApi iqdbApi)
+        private async Task DownloadFile(ProcessingFileInfo file, IIqdbApi iqdbApi)
         {
             try
             {
@@ -72,6 +72,7 @@ namespace Rubybooru.Downloader.lib
                 {
                     matches = await DownloadResizedFile(file, iqdbApi);
                 }
+                Logger.Info($"Have matches for '{file}'");
 
                 Task.Run(() => ProcessMatches(file, matches), _cancelToken);
             }
@@ -105,7 +106,7 @@ namespace Rubybooru.Downloader.lib
                 file.State = ProcessingState.Parsing;
                 
                 // TODO: parse match - parser locks, error catching
-                var result = await _parser.Parse(best.Url);
+                // var result = await _parser.Parse(best.Url);
                 
                 MoveFile(file, _settings.DownloadedDirPath);
                 // TODO: save data

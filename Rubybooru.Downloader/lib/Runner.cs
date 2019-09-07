@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Rubybooru.Downloader.lib.preprocess;
 
 namespace Rubybooru.Downloader.lib
@@ -14,18 +16,17 @@ namespace Rubybooru.Downloader.lib
         {
             this.settings = settings;
             // TODO: Check settings validity
+            // TODO: create folders
         }
 
-        public void Start()
+        public Task Start(CancellationToken cancelToken)
         {
-            // TODO: Make task?
             var files = GetFiles(settings.SourceImagesDirPath, settings.IncludeSubdirs);
             files = Preprocess(files);
             files = Filter.FilterFiles(files, settings.AllowedExtensions);
-            // Filter.Filter
-            // Downloader.Start
 
-            Console.WriteLine(files);
+            var downloader = new Downloader(files, settings, cancelToken);
+            return downloader.Start();
         }
 
         private List<string> GetFiles(string path, bool includeSubdirs)

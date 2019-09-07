@@ -18,12 +18,13 @@ namespace Rubybooru.Downloader.lib
         public event PropertyChangedEventHandler PropertyChanged;
         public string File { get; set; }
 
+        private ProcessingState _state;
         public ProcessingState State
         {
-            get => State;
+            get => _state;
             set
             {
-                State = value;
+                _state = value;
                 OnPropertyChanged(nameof(State));
             }
         }
