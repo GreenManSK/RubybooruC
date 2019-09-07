@@ -100,7 +100,7 @@ namespace Rubybooru.Downloader.lib
             var best = matches != null ? _matchRanker.PickBest(matches) : null;
             if (best != null)
             {
-                Logger.Info($"Parsing '{file}'");
+                Logger.Info($"Parsing '{file.File}'");
                 file.State = ProcessingState.Parsing;
 
                 ParseResult result = null;
@@ -173,11 +173,6 @@ namespace Rubybooru.Downloader.lib
             {
                 Interlocked.Increment(ref FinishedFiles);
             }
-        }
-
-        public static string GetJsonFileName(string file)
-        {
-            return $"{file}.json";
         }
     }
 }
