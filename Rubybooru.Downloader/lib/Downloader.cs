@@ -9,6 +9,7 @@ using IqdbApi.api;
 using IqdbApi.parsers;
 using IqdbApi.parsers.impl;
 using NLog;
+using Rubybooru.Data;
 using Rubybooru.Downloader.lib.helper;
 
 namespace Rubybooru.Downloader.lib
@@ -116,16 +117,20 @@ namespace Rubybooru.Downloader.lib
                     }
                     catch (Exception e)
                     {
-                        var msg = $"Error while parsing file '{file.File}'";
-                        Logger.Error(e, msg);
-                        Errors.Add(new DownloadError(msg, e));
+                        FileError(file, e, $"Error while parsing file '{file.File}'");
                     }
                 }
 
                 if (result == null) return;
-                MoveFile(file, _settings.DownloadedDirPath);
-                // TODO: save data
-                Logger.Info(file.File + " " + result.Tags.Count);
+                var newFilePath = MoveFile(file, _settings.DownloadedDirPath);
+                try
+                {
+                    JsonHelper.SaveJson(newFilePath, best, result);
+                }
+                catch (Exception e)
+                {
+                    FileError(file, e, $"Error while saving data for file '{file.File}'");
+                }
 
                 FinishFile(file);
             }
@@ -138,20 +143,23 @@ namespace Rubybooru.Downloader.lib
             }
         }
 
-        private void MoveFile(ProcessingFileInfo file, string dest)
+        private string MoveFile(ProcessingFileInfo file, string dest)
         {
             if (dest == null)
-                return;
+                return file.File;
             try
             {
                 var fileName = Path.GetFileName(file.File);
                 var destFile = Path.Combine(dest, fileName);
                 File.Move(file.File, destFile);
+                return destFile;
             }
             catch (Exception e)
             {
                 FileError(file, e, $"Error while moving file '{file.File}' to '{dest}'");
             }
+
+            return file.File;
         }
 
         private void FileError(ProcessingFileInfo file, Exception e, string msg)

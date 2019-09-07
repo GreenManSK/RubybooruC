@@ -122,6 +122,10 @@
       <Project>{23B8C098-C268-4E33-85E7-9224C150D565}</Project>
       <Name>IqdbApi</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Rubybooru.Data\Rubybooru.Data.csproj">
+      <Project>{96e07e98-db1b-44e3-a920-17d0ffca8275}</Project>
+      <Name>Rubybooru.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
