@@ -31,6 +31,7 @@ namespace Rubybooru.Downloader
 
         public HashSet<string> AllowedExtensions { get; set; } = new HashSet<string>()
         {
+            ".jfif",
             ".jpg",
             ".jpeg",
             ".png"
